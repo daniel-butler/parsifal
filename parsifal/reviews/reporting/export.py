@@ -13,17 +13,15 @@ def export_review_to_docx(review, sections):
         document.add_paragraph('')
 
     if 'authors' in sections:
-        authors = list()
-        authors.append(review.author.profile.get_screen_name())
+        authors = [review.author.profile.get_screen_name()]
         for author in review.co_authors.all():
             authors.append(author.profile.get_screen_name())
         p = document.add_paragraph(', '.join(authors))
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         document.add_paragraph('')
 
-    if 'description' in sections:
-        if review.description:
-            document.add_paragraph(review.description)
+    if 'description' in sections and review.description:
+        document.add_paragraph(review.description)
 
 
     document.add_heading('Planning', level=2)

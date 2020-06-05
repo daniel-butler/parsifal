@@ -27,7 +27,7 @@ def settings(request, username, review_name):
             if unique_name != review_name:
                 i = 0
                 while Review.objects.filter(name=unique_name, author__username=review.author.username):
-                    i = i + 1
+                    i += 1
                     unique_name = u'{0}-{1}'.format(name, i)
             form.instance.name = unique_name
             review = form.save()

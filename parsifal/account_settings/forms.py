@@ -39,8 +39,7 @@ class ProfileForm(forms.ModelForm):
         u.first_name = self.cleaned_data['first_name']
         u.last_name = self.cleaned_data['last_name']
         u.save()
-        profile = super(ProfileForm, self).save(*args,**kwargs)
-        return profile
+        return super(ProfileForm, self).save(*args,**kwargs)
 
 class PasswordForm(PasswordChangeForm):
     old_password = forms.CharField(label='Old password', widget=forms.PasswordInput(attrs={ 'class': 'form-control' }))

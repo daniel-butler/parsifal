@@ -70,8 +70,7 @@ class Review(models.Model):
         return reverse('review', args=(str(self.author.username), str(self.name)))
 
     def get_questions(self):
-        questions = Question.objects.filter(review__id=self.id)
-        return questions
+        return Question.objects.filter(review__id=self.id)
 
     def get_inclusion_criterias(self):
         return SelectionCriteria.objects.filter(review__id=self.id, criteria_type='I')
@@ -85,10 +84,7 @@ class Review(models.Model):
     def is_author_or_coauthor(self, user):
         if user.id == self.author.id:
             return True
-        for co_author in self.co_authors.all():
-            if user.id == co_author.id:
-                return True
-        return False
+        return any(user.id == co_author.id for co_author in self.co_authors.all())
 
     def get_generic_search_string(self):
         try:
@@ -111,7 +107,7 @@ class Review(models.Model):
 
     def get_duplicate_articles(self):
         articles = Article.objects.filter(review__id=self.id).exclude(status=Article.DUPLICATED).order_by('title')
-        grouped_articles = dict()
+        grouped_articles = {}
 
         for article in articles:
             slug = slugify(article.title)
@@ -120,7 +116,7 @@ class Review(models.Model):
             grouped_articles[slug]['size'] += 1
             grouped_articles[slug]['articles'].append(article)
 
-        duplicates = list()
+        duplicates = []
         for slug, data in grouped_articles.iteritems():
             if data['size'] > 1:
                 duplicates.append(data['articles'])
@@ -221,8 +217,9 @@ class SearchSession(models.Model):
 
     def search_string_as_html(self):
         escaped_string = escape(self.search_string)
-        html = escaped_string.replace(' OR ', ' <strong>OR</strong> ').replace(' AND ', ' <strong>AND</strong> ')
-        return html
+        return escaped_string.replace(' OR ', ' <strong>OR</strong> ').replace(
+            ' AND ', ' <strong>AND</strong> '
+        )
 
 
 def search_result_file_upload_to(instance, filename):
@@ -318,13 +315,12 @@ class Article(models.Model):
 
     def get_score(self):
         score = QualityAssessment.objects.filter(article__id=self.id).aggregate(Sum('answer__weight'))
-        if score['answer__weight__sum'] == None:
+        if score['answer__weight__sum'] is None:
             return 0.0
         return score['answer__weight__sum']
 
     def get_quality_assesment(self):
-        quality_assessments = QualityAssessment.objects.filter(article__id=self.id)
-        return quality_assessments
+        return QualityAssessment.objects.filter(article__id=self.id)
 
     def get_status_html(self):
         label = { Article.UNCLASSIFIED: 'default', Article.REJECTED: 'danger', Article.ACCEPTED: 'success', Article.DUPLICATED: 'warning' }

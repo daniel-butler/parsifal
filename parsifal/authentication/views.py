@@ -14,22 +14,21 @@ from parsifal.reviews.models import Review
 
 
 def signup(request):
-    if request.method == 'POST':
-        form = SignUpForm(request.POST)
-        if not form.is_valid():
-            messages.add_message(request, messages.ERROR, 'There was some problems while creating your account. Please review some fields before submiting again.')
-            return render(request, 'auth/signup.html', { 'form': form })
-        else:
-            username = form.cleaned_data.get('username')
-            email = form.cleaned_data.get('email')
-            password = form.cleaned_data.get('password')
-            User.objects.create_user(username=username, password=password, email=email)
-            user = authenticate(username=username, password=password)
-            login(request, user)
-            messages.add_message(request, messages.SUCCESS, 'Your account were successfully created.')
-            return HttpResponseRedirect('/' + username + '/')
-    else:
+    if request.method != 'POST':
         return render(request, 'auth/signup.html', { 'form': SignUpForm() })
+    form = SignUpForm(request.POST)
+    if not form.is_valid():
+        messages.add_message(request, messages.ERROR, 'There was some problems while creating your account. Please review some fields before submiting again.')
+        return render(request, 'auth/signup.html', { 'form': form })
+    else:
+        username = form.cleaned_data.get('username')
+        email = form.cleaned_data.get('email')
+        password = form.cleaned_data.get('password')
+        User.objects.create_user(username=username, password=password, email=email)
+        user = authenticate(username=username, password=password)
+        login(request, user)
+        messages.add_message(request, messages.SUCCESS, 'Your account were successfully created.')
+        return HttpResponseRedirect('/' + username + '/')
 
 def signin(request):
     if request.user.is_authenticated():

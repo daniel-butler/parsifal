@@ -252,12 +252,10 @@ def remove_from_folder(request):
         documents = folder.documents.all()
         documents = get_filtered_documents(documents, querystring)
         documents_size = documents.count()
-        folder.documents.remove(*documents)
     else:
         documents = request.POST.getlist('document')
         documents_size = len(documents)
-        folder.documents.remove(*documents)
-
+    folder.documents.remove(*documents)
     messages.success(request, u'{0} {1} successfully removed from folder {2}!'.format(
             documents_size, 
             get_document_verbose_name(documents_size), 

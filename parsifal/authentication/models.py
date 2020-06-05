@@ -79,7 +79,7 @@ class Profile(models.Model):
 
     def get_url(self):
         url = self.url
-        if "http://" not in self.url and "https://" not in self.url and len(self.url) > 0:
+        if "http://" not in url and "https://" not in url and len(url) > 0:
             url = "http://" + str(self.url)
         return url 
 
@@ -112,8 +112,9 @@ class Profile(models.Model):
         return followers
 
     def get_followers_count(self):
-        followers_count = Activity.objects.filter(to_user__pk=self.pk, activity_type=Activity.FOLLOW).count()
-        return followers_count
+        return Activity.objects.filter(
+            to_user__pk=self.pk, activity_type=Activity.FOLLOW
+        ).count()
 
     def get_following(self):
         activities = Activity.objects.filter(from_user__pk=self.pk, activity_type=Activity.FOLLOW)
@@ -123,8 +124,9 @@ class Profile(models.Model):
         return following
 
     def get_following_count(self):
-        following_count = Activity.objects.filter(from_user__pk=self.pk, activity_type=Activity.FOLLOW).count()
-        return following_count
+        return Activity.objects.filter(
+            from_user__pk=self.pk, activity_type=Activity.FOLLOW
+        ).count()
 
     def get_reviews(self):
         user_reviews = []

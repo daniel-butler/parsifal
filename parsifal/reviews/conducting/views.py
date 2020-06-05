@@ -218,9 +218,11 @@ def build_quality_assessment_table(request, review, order):
 
                 for answer in quality_answers:
                     selected_answer = ''
-                    if question_answer is not None:
-                        if answer.id == question_answer.answer.id:
-                            selected_answer = ' selected-answer'
+                    if (
+                        question_answer is not None
+                        and answer.id == question_answer.answer.id
+                    ):
+                        selected_answer = ' selected-answer'
                     str_table += u'''<td class="answer'''+ selected_answer +'''" answer-id="''' + str(answer.id) + '''">''' + escape(answer.description) + '''</td>'''
                 str_table += u'''</tr>'''
 
@@ -460,9 +462,9 @@ def _import_articles(request, source, articles):
             try:
                 article.created_by = request.user
                 article.save()
-                success = success + 1
+                success += 1
             except:
-                error = error + 1
+                error += 1
         if success > 0:
             messages.success(request, u'{0} articles successfully imported to {1}!'.format(success, source.name))
         if error > 0:
@@ -585,7 +587,7 @@ def build_article_table_row(article):
     if article.created_at:
         date = article.created_at.strftime('%d %b %Y %H:%M:%S')
 
-    row = u'''<tr oid="{0}" article-status="{1}">
+    return u'''<tr oid="{0}" article-status="{1}">
             <td><input type="checkbox" value="{0}""></td>
             <td>{2}</td>
             <td>{3}</td>
@@ -595,17 +597,18 @@ def build_article_table_row(article):
             <td>{7}</td>
             <td>{8}</td>
             <td>{9}</td>
-          </tr>'''.format(article.id,
-            article.status,
-            escape(article.bibtex_key),
-            escape(article.title),
-            escape(article.author),
-            escape(article.journal),
-            escape(article.year),
-            name,
-            date,
-            article.get_status_html())
-    return row
+          </tr>'''.format(
+        article.id,
+        article.status,
+        escape(article.bibtex_key),
+        escape(article.title),
+        escape(article.author),
+        escape(article.journal),
+        escape(article.year),
+        name,
+        date,
+        article.get_status_html(),
+    )
 
 
 @author_required

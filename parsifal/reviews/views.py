@@ -50,7 +50,7 @@ def new(request):
             unique_name = name
             i = 0
             while Review.objects.filter(name=unique_name, author__username=request.user.username):
-                i = i + 1
+                i += 1
                 unique_name = u'{0}-{1}'.format(name, i)
             form.instance.name = unique_name
             review = form.save()
@@ -102,7 +102,7 @@ def add_author_to_review(request):
 
             subject = u'{0} wants to add you as co-author on the systematic literature review {1}'.format(inviter_name, review.title)
             from_email = u'{0} via Parsifal <noreply@parsif.al>'.format(inviter_name)
-            
+
             text_content = u'''Hi {0}, 
             {1} invited you to a Parsifal Systematic Literature Review called "{2}". 
             View the review at https://parsif.al/{3}/{4}/'''.format(email, inviter_name, review.title, request.user.username, review.name)
@@ -119,9 +119,9 @@ def add_author_to_review(request):
 
     review.save()
 
-    if not authors_added and not authors_invited:
+    if not (authors_added or authors_invited):
         messages.info(request, u'No author invited or added to the review. Nothing really changed.')
-    
+
     if authors_added:
         messages.success(request, u'The authors {0} were added successfully.'.format(u', '.join(authors_added)))
 
